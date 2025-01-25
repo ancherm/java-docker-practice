@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  spring-boot-app:
+    container_name: spring-boot-app
+    build:
+      context: ../../
+      dockerfile: ops-tools/docker/images/app/Dockerfile
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/school
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: school
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+    ports:
+      - "8888:8888"
+    networks:
+      - docker-practice-net
+
+  postgres:
+    image: postgres
+    container_name: postgres-docker-practice
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: school
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: school
+    volumes:
+      - ../../data/postgres:/var/lib/postgresql/data
+      - ../../data/dump:/db-dump
+    networks:
+      - docker-practice-net
+
+  redis:
+    image: redis
+    container_name: redis-docker-practice
+    ports:
+      - "6379:6379"
+    networks:
+      - docker-practice-net
+
+networks:
+  docker-practice-net:
